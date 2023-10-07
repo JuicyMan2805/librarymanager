@@ -8,6 +8,7 @@ public class LibrarymanagerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(LibrarymanagerApplication.class, args);
+        System.out.println("Host is Stater");
 	}
 
 }
