@@ -18,14 +18,25 @@ public class ReposnseDto<T> {
         ReposnseDto<T> output = new ReposnseDto<>();
         output.setCode("SUCCESS");
         output.setMessage("SUCCESS");
+        output.setTime(LocalDateTime.now());
+        output.setData(input);
+        return output;
+    }
+
+    public static <T> ReposnseDto fail(T input, Exception exception) {
+        ReposnseDto<T> output = new ReposnseDto<>();
+        output.setCode("SERVER ERROR");
+        output.setMessage(exception.getMessage());
+        output.setTime(LocalDateTime.now());
         output.setData(input);
         return output;
     }
 
     public static <T> ReposnseDto fail(T input, BusinessException exception) {
         ReposnseDto<T> output = new ReposnseDto<>();
-        output.setCode("SERVER ERROR");
+        output.setCode(exception.getErrorCode());
         output.setMessage(exception.getErrorMessage());
+        output.setTime(LocalDateTime.now());
         output.setData(input);
         return output;
     }

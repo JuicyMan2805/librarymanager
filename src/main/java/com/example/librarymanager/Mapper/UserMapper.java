@@ -1,5 +1,6 @@
 package com.example.librarymanager.Mapper;
 
+import com.example.librarymanager.Dto.Account.output.GetPersonalInfoOutput;
 import com.example.librarymanager.Dto.auth.Input.SignUpInput;
 import com.example.librarymanager.Entity.UserEntity;
 import com.example.librarymanager.Util.AuthUtil;
@@ -14,8 +15,11 @@ import org.mapstruct.factory.Mappers;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
+    //chỉ định Password
     @Mapping(target = "password", expression = "java(AuthUtil.hashPassword(input.getPassword()))")
-        //chỉ định Password
+
     UserEntity mapFromSignUpInput(SignUpInput input);
+
+    GetPersonalInfoOutput mapToPersonalInfoOutput(UserEntity input);
 
 }

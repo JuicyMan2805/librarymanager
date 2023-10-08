@@ -1,10 +1,12 @@
 package com.example.librarymanager.Controller;
 
+import com.example.librarymanager.Dto.api.ReposnseDto;
 import com.example.librarymanager.Dto.auth.Input.LoginInput;
 import com.example.librarymanager.Dto.auth.Input.SignUpInput;
+import com.example.librarymanager.Dto.auth.Output.LoginOutput;
+import com.example.librarymanager.Dto.auth.Output.SignUpOutput;
 import com.example.librarymanager.Service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,13 +24,13 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginInput input) { //requestBody dùng để nhận body
-        return ResponseEntity.ok().body("Đăng nhập thành công");
+    public ReposnseDto<LoginOutput> login(@RequestBody LoginInput input) { //requestBody dùng để nhận body
+        return ReposnseDto.ok(authService.login(input));
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<?> signUp(@RequestBody SignUpInput input) {
-        return ResponseEntity.ok().body(authService.signUp(input));
+    public ReposnseDto<SignUpOutput> signUp(@RequestBody SignUpInput input) {
+        return ReposnseDto.ok(authService.signUp(input));
     }
 
 }

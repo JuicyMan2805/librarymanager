@@ -4,15 +4,22 @@ import com.example.librarymanager.Customenum.RoleEnum;
 import com.example.librarymanager.Customenum.UserTypeEnum;
 import com.example.librarymanager.Dto.auth.Input.LoginInput;
 import com.example.librarymanager.Dto.auth.Input.SignUpInput;
+import com.example.librarymanager.Dto.auth.Output.LoginOutput;
 import com.example.librarymanager.Dto.auth.Output.SignUpOutput;
+import com.example.librarymanager.Dto.auth.UserAuthentication;
 import com.example.librarymanager.Entity.UserEntity;
 import com.example.librarymanager.Exception.BusinessException;
 import com.example.librarymanager.Mapper.UserMapper;
 import com.example.librarymanager.Repository.UserRepository;
 import com.example.librarymanager.Service.AuthService;
 import com.example.librarymanager.Util.AuthUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 /**
  * nơi tương tác với cơ sở dữ liệu
@@ -23,23 +30,37 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
+    //    @Value("${app.secret-key}")
+    @Value("${app.secret-key}")
+    private String secretKey;
+
 
     @Override
-    public SignUpOutput login(LoginInput input) {
+    public LoginOutput login(LoginInput input) {
         // Kiểm tra username có tồn tại chưa
         String username = input.getUsername();
         UserEntity existedUser = userRepository.findFirstByUsername(username);
         if (existedUser == null) {
             throw new BusinessException("NOT_EXISTED_USERNAME", "Tài khoản chưa tồn tại!");
         }
-        String hashedpassword = AuthUtil.hashPassword(input.getPassword());
+        String hashedPassword = AuthUtil.hashPassword(input.getPassword());
         String savedPassword = existedUser.getPassword();
-        if (!hashedpassword.equals(savedPassword)) {
-            throw new BusinessException("INCORRECT_PASSWORD", "Mật khẩu không chính xác");
+        if (!hashedPassword.equals(savedPassword)) {
+            throw new BusinessException("INCORRECT_PASSWORD", "Mật khẩu nhập không chính xác!");
         }
-//            Generate Token jwt(JSon wed token) and return
-        SignUpOutput output = new SignUpOutput();
+        // Generate jwt(json web token) and return
+        UserAuthentication userAuthentication = new UserAuthentication();
+        userAuthentication.setUserId(existedUser.getId());
+        userAuthentication.setRole(existedUser.getRole());
+        userAuthentication.setType(existedUser.getType());
+        Map<String, Object> payload = objectMapper.convertValue(userAuthentication,
+                new TypeReference<Map<String, Object>>() {
+                });
+        LoginOutput output = new LoginOutput();
         output.setUserId(existedUser.getId());
+        output.setToken(AuthUtil.generateToken(payload, secretKey));
         return output;
     }
 
