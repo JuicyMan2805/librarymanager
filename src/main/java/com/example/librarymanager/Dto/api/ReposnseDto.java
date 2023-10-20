@@ -23,19 +23,19 @@ public class ReposnseDto<T> {
         return output;
     }
 
-    public static <T> ReposnseDto fail(T input, Exception exception) {
+    public static <T> ReposnseDto fail(T input, BusinessException exception) {
         ReposnseDto<T> output = new ReposnseDto<>();
-        output.setCode("SERVER ERROR");
-        output.setMessage(exception.getMessage());
+        output.setCode(exception.getErrorCode());
+        output.setMessage(exception.getErrorMessage());
         output.setTime(LocalDateTime.now());
         output.setData(input);
         return output;
     }
 
-    public static <T> ReposnseDto fail(T input, BusinessException exception) {
+    public static <T> ReposnseDto fail(T input, Exception exception) {
         ReposnseDto<T> output = new ReposnseDto<>();
-        output.setCode(exception.getErrorCode());
-        output.setMessage(exception.getErrorMessage());
+        output.setCode("SERVER ERROR");
+        output.setMessage(exception.getMessage());
         output.setTime(LocalDateTime.now());
         output.setData(input);
         return output;

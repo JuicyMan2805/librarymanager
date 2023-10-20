@@ -1,13 +1,16 @@
 package com.example.librarymanager.Util;
 
+import com.example.librarymanager.Dto.auth.UserAuthentication;
 import com.example.librarymanager.Exception.AuthException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Ulit : class không được kế thừa (thường dùng là final class)
@@ -39,6 +42,19 @@ public final class AuthUtil {
         } catch (Exception e) {
             throw new AuthException("TOKEN_FAIL", "Token không khả dụng");
         }
+    }
+
+    public static UserAuthentication getUserAuthentication() {
+        return (UserAuthentication) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+    }
+
+    public static Long getUserId() {
+        UserAuthentication userAuthentication = getUserAuthentication();
+        return Optional.ofNullable(userAuthentication).map(UserAuthentication::getUserId)
+                .orElse(null);
     }
 
 }

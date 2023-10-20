@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class SuperEntity {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "create_time")

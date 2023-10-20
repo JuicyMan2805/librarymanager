@@ -1,11 +1,14 @@
 package com.example.librarymanager.Config.Filter;
 
+
 import com.example.librarymanager.Dto.api.ReposnseDto;
 import com.example.librarymanager.Dto.auth.UserAuthentication;
 import com.example.librarymanager.Exception.AuthException;
 import com.example.librarymanager.Util.AuthUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -32,17 +35,22 @@ public class JWTFilter extends OncePerRequestFilter {
     private String secretKey;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
-            String token = request.getHeader(HttpHeaders.AUTHORIZATION).replace("Bearer ", "");
-            UserAuthentication user = objectMapper.convertValue(AuthUtil.getPayloadJwt(token, secretKey),
-                    UserAuthentication.class);
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+            //kiểm tra xem có bị rỗng không, đúng sai, xóa khoảng trắng
+            if (StringUtils.isNotBlank(authorization)) {
+                String token = authorization.replace("Bearer ", "");
+                UserAuthentication user = objectMapper.convertValue(AuthUtil.getPayloadJwt(token, secretKey),
+                        UserAuthentication.class);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
             filterChain.doFilter(request, response);
+
         } catch (AuthException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write(objectMapper.writeValueAsString(ReposnseDto.fail(null, e)));

@@ -21,12 +21,20 @@ public class BookEntity extends SuperEntity {
     @Column(name = "Date_of_publication")
     private LocalDate provideDate;
 
-    @ManyToOne()
-    @JoinColumn(name = "category_id")
+//    @ManyToOne()
+//    @JoinColumn(name = "Total")
+//    private CategoryEntity total;
+//
+//    @ManyToOne()
+//    @JoinColumn(name = "Existed")
+//    private AuthorEntity existed;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Category_id")
     private CategoryEntity category;
 
-    @ManyToOne()
-    @JoinColumn(name = "author_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Author_id")
     private AuthorEntity author;
 
 }
